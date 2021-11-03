@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 object Launcher extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = {
-    val token: String = ConfigFactory.load("application.conf").getString("bot.token")
+    val token: String = System.getenv("TOKEN")
     new EchoBot[IO](token).startPolling().map(_ => ExitCode.Success)
   }
 }
