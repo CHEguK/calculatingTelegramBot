@@ -1,0 +1,15 @@
+.idea
+.metals
+.code
+target
+.bloop
+*.log
+**/target/
+**/logs/
+params.conf
+/.bsp/
+.vscode
+metals.sbt
+*h2.mv.db
+null
+*.sc
