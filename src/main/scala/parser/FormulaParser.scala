@@ -22,8 +22,8 @@ object FormulaParser extends RegexParsers with PackratParsers {
 
   def apply(code: String): Either[ParserError, Expression] =
     parse(expression, new PackratReader(new CharSequenceReader(code))) match {
-      case Success(result, next) => Right(result)
-      case NoSuccess(msg, next) => Left(ParserError(msg))
+      case Success(result, _) => Right(result)
+      case NoSuccess(msg, _) => Left(ParserError(msg))
     }
 
   case class ParserError(msg: String)
