@@ -12,3 +12,5 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0",
   "com.typesafe" % "config" % "1.4.1"
 )
+
+enablePlugins(JavaAppPackaging)
