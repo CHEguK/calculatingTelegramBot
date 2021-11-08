@@ -18,7 +18,7 @@ class EchoBot[F[_]: Concurrent: ContextShift](token: String) extends ExampleBot[
       "pi" -> math.Pi,
       "e" -> math.E)
 
-    val funcs: (String) => (Double) => Double = Map(
+    val funcs: Map[String, (Double) => Double] = Map(
       "sin" -> math.sin,
       "cos" -> math.cos,
       "inc" -> { d: Double => d + 1 }
