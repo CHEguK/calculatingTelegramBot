@@ -35,7 +35,7 @@ class EchoBot[F[_]: Concurrent: ContextShift](token: String) extends ExampleBot[
     )
 
     msg.text.fold(unit) { text =>
-      val u = FormulaParser(text)
+      val u = FormulaParser(text.toLowerCase())
       u match {
         case Left(error) => request(SendMessage(msg.source, s"\'$text\' parsing error: $error")).void
         case Right(value) =>
