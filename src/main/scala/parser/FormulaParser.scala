@@ -4,7 +4,7 @@ import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
 object FormulaParser extends RegexParsers with PackratParsers {
-  def id: Parser[Id] = "[a-zA-Z][a-zA-Z0-9_]*".r ^^ Id
+  def id: Parser[Id] = "[а-яА-Яa-zA-Z][а-яА-Яa-zA-Z0-9_]*".r ^^ Id
 
   def number: Parser[Number] = "-" ~> number ^^ (n => Number(-n.value)) |
     ("[0-9]+\\.[0-9]*".r | "[0-9]+".r) ^^ (n => Number(n.toDouble))

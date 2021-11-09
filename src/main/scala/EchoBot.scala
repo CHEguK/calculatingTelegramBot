@@ -16,19 +16,33 @@ class EchoBot[F[_]: Concurrent: ContextShift](token: String) extends ExampleBot[
 
     val vars = Map(
       "pi" -> math.Pi,
-      "e" -> math.E)
+      "e" -> math.E
+    )
 
-    val funcs: Map[String, (Double) => Double] = Map(
-      "sin" -> math.sin,
-      "cos" -> math.cos,
-      "inc" -> { d: Double => d + 1 }
+    val funcs: Map[String, Either[String, Double] => Either[String, Double]] = Map(
+      "sin" -> {
+        case Left(msg) => Left(msg)
+        case Right(value) => Right(math.sin(value))
+      },
+      "cos" -> {
+        case Left(msg) => Left(msg)
+        case Right(value) => Right(math.cos(value))
+      },
+      "inc" -> {
+        case Left(msg) => Left(msg)
+        case Right(value) => Right(value + 1)
+      }
     )
 
     msg.text.fold(unit) { text =>
       val u = FormulaParser(text)
       u match {
         case Left(error) => request(SendMessage(msg.source, s"\'$text\' parsing error: $error")).void
-        case Right(value) => request(SendMessage(msg.source, Evaluator(value, vars, funcs).toString)).void
+        case Right(value) =>
+          Evaluator(value, vars, funcs) match {
+            case Right(value) => request(SendMessage(msg.source, value.toString)).void
+            case Left(errorMsg) => request(SendMessage(msg.source, errorMsg)).void
+          }
       }
     }
   }
