@@ -1,9 +1,8 @@
 package parser
 
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
-import scala.util.parsing.input.CharSequenceReader
 
-object FormulaParser extends RegexParsers with PackratParsers {
+class FormulaParser extends RegexParsers with PackratParsers {
   def id: Parser[Id] = "[а-яА-Яa-zA-Z][а-яА-Яa-zA-Z0-9_]*".r ^^ Id
 
   def number: Parser[Number] = "-" ~> number ^^ (n => Number(-n.value)) |
@@ -19,12 +18,4 @@ object FormulaParser extends RegexParsers with PackratParsers {
   private def binOperation(p: Expression ~ String ~ Expression) = p match {
     case e1 ~ op ~ e2 => BinOperation(e1, BinOperator(op), e2)
   }
-
-  def apply(code: String): Either[ParserError, Expression] =
-    parse(expression, new PackratReader(new CharSequenceReader(code))) match {
-      case Success(result, _) => Right(result)
-      case NoSuccess(msg, _) => Left(ParserError(msg))
-    }
-
-  case class ParserError(msg: String)
 }

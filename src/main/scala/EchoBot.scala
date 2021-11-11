@@ -4,7 +4,7 @@ import com.bot4s.telegram.cats.Polling
 import com.bot4s.telegram.methods._
 import com.bot4s.telegram.api.declarative.{Commands, RegexCommands}
 import com.bot4s.telegram.models._
-import parser.{Evaluator, FormulaParser}
+import parser.{Evaluator, FormulaParser, RunParser}
 
 import scala.util.matching.Regex
 
@@ -35,8 +35,7 @@ class EchoBot[F[_]: Concurrent: ContextShift](token: String) extends ExampleBot[
     )
 
     msg.text.fold(unit) { text =>
-      val u = FormulaParser(text.toLowerCase())
-      u match {
+      RunParser(text.toLowerCase()) match {
         case Left(error) => request(SendMessage(msg.source, s"\'$text\' parsing error: $error")).void
         case Right(value) =>
           Evaluator(value, vars, funcs) match {

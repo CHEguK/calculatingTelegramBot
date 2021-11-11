@@ -10,7 +10,8 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-effect" % "2.5.3",
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % "3.2.3",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0",
-  "com.typesafe" % "config" % "1.4.1"
+  "com.typesafe" % "config" % "1.4.1",
+  "org.scalatest" %% "scalatest-funsuite" % "3.2.10" % "test",
 )
 
 enablePlugins(JavaAppPackaging)
