@@ -22,7 +22,7 @@ object Evaluator {
     }
   }
 
-  def operator2func(binOperator: BinOperator)(left: Either[String, Double], right: Either[String, Double]): Either[String, Double] = {
+  private def operator2func(binOperator: BinOperator)(left: Either[String, Double], right: Either[String, Double]): Either[String, Double] = {
     (left, right) match {
       case (Right(a), Right(b)) => binOperator.op match {
         case "+" => Right(a + b)
@@ -34,6 +34,7 @@ object Evaluator {
           } else {
             Left("На ноль делить нельзя, сука") // TODO: "суку" лучше убрать
           }
+        case op => Left(s"Operator: '$op' doesn't exist")
       }
       case (Left(msg), _) => Left(msg)
       case (_, Left(msg)) => Left(msg)

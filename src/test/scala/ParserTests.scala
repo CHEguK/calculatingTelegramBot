@@ -1,11 +1,21 @@
+import org.scalatest.EitherValues
 import org.scalatest.funsuite.AnyFunSuite
-import parser.{BinOperation, BinOperator, FormulaParser, FuncCall, Id, Number}
+import parser.RunParser.ParserError
+import parser.{BinOperation, BinOperator, Evaluator, FormulaParser, FuncCall, Id, Number, RunParser}
 
-import scala.util.parsing.combinator.RegexParsers
 import scala.util.parsing.input.CharSequenceReader
 
 
-class ParserTests extends AnyFunSuite {
+class ParserTests extends AnyFunSuite with EitherValues {
+
+  val vars = Map("one" -> 1.0)
+
+  val funcs: Map[String, Either[String, Double] => Either[String, Double]] = Map(
+    "sin" -> {
+      case Left(msg) => Left(msg)
+      case Right(value) => Right(math.sin(value))
+    }
+  )
 
   object PTest extends FormulaParser {
     def testNumber(terms: List[(String, Any)]) = {
@@ -86,12 +96,32 @@ class ParserTests extends AnyFunSuite {
       ("facup sin(pi/2) / +3/4 * 73.2- -12 + кос(1) + (21 - 1/2) +1 - син(пи) * (123 /1 + 13* 12)", Id("facup"))
     )
 
-
     PTest.testNumber(dataForNumberTests)
     PTest.testId(dataForIdTests)
     PTest.testFunCall(dataForFunCallTests)
     PTest.testValue(dataForValueTests)
     PTest.testTerm(dataForValueTests ++ dataForTermTests)
     PTest.testExpression(dataForExpressionTests)
+  }
+
+  test("Test RunParser") {
+    assert(RunParser.apply("1 + 1").value === BinOperation(Number(1.0),BinOperator("+"),Number(1.0)))
+    assert(RunParser.apply("2").value === Number(2.0))
+    assert(RunParser.apply("*").left.value === ParserError("'(' expected but '*' found"))
+    assert(RunParser.apply(")").left.value === ParserError("'(' expected but ')' found"))
+  }
+
+  test("Test Evaluator") {
+    assert(Evaluator(Number(1.0), vars).value === 1.0)
+    assert(Evaluator(Id("one"), vars).value === 1.0)
+    assert(Evaluator(Id("one")).left.value === "'one' - Неизвестное значение")
+    assert(Evaluator(BinOperation(Number(1), BinOperator("+"), Number(1))).value === 2.0)
+    assert(Evaluator(BinOperation(Number(1), BinOperator("-"), Number(1))).value === 0.0)
+    assert(Evaluator(BinOperation(Number(1), BinOperator("*"), Number(2))).value === 2.0)
+    assert(Evaluator(BinOperation(Number(4), BinOperator("/"), Number(2))).value === 2.0)
+    assert(Evaluator(BinOperation(Number(1), BinOperator("/"), Number(0))).left.value === "На ноль делить нельзя, сука")
+    assert(Evaluator(BinOperation(Number(1), BinOperator("err"), Number(1))).left.value === "Operator: 'err' doesn't exist")
+    assert(Evaluator(FuncCall(Id("sin"), Number(0)), functions = funcs).value === 0.0)
+    assert(Evaluator(FuncCall(Id("sin"), Number(0))).left.value === "'sin' - Неизвестная функция")
   }
 }
