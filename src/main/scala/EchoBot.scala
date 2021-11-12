@@ -13,7 +13,6 @@ class EchoBot[F[_]: Concurrent: ContextShift](token: String) extends ExampleBot[
 
   override def receiveMessage(msg: Message): F[Unit] = {
 
-
     val vars = Map(
       "pi" -> math.Pi,
       "e" -> math.E
